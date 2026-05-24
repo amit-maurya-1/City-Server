@@ -1,44 +1,38 @@
-// src/contexts/AuthContext.jsx
-// Provides auth state (user, profile, role) to the entire app.
-// Wrap <App /> with <AuthProvider> in main.jsx.
-
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession]   = useState(null)   // Supabase session
-  const [profile, setProfile]   = useState(null)   // profiles table row
-  const [loading, setLoading]   = useState(true)   // initial auth check
+  const [session, setSession]   = useState(null)
+  const [profile, setProfile]   = useState(null)
+  const [loading, setLoading]   = useState(true)
+  const [profileError, setProfileError] = useState(null)
+  const isFetching = useRef(false)  // 👈 prevents double fetch
 
-  // Fetch user profile from profiles table
   async function fetchProfile(userId) {
+    if (isFetching.current) return  // 👈 guard against race condition
+    isFetching.current = true
+    setProfileError(null)
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*, cities(id, name, slug)')
       .eq('id', userId)
       .single()
 
+    isFetching.current = false
+
     if (error) {
       console.error('Error fetching profile:', error.message)
+      setProfileError(error.message)  // 👈 expose error to UI
       return null
     }
     return data
   }
 
   useEffect(() => {
-    // 1. Get current session on mount
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session)
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id)
-        setProfile(profile)
-      }
-      setLoading(false)
-    })
-
-    // 2. Listen for auth state changes (login, logout, token refresh)
+    // Only use onAuthStateChange — skip getSession to avoid double fetch
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session)
@@ -47,15 +41,15 @@ export function AuthProvider({ children }) {
           setProfile(profile)
         } else {
           setProfile(null)
+          setProfileError(null)
         }
-        setLoading(false)
+        setLoading(false)  // always called, even on error
       }
     )
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Convenience helpers
   const user    = session?.user ?? null
   const role    = profile?.role ?? null
   const cityId  = profile?.city_id ?? null
@@ -75,6 +69,7 @@ export function AuthProvider({ children }) {
     city,
     isAdmin,
     loading,
+    profileError,   // 👈 expose so UI can show error instead of infinite spinner
     signOut,
     refreshProfile: async () => {
       if (user) {
@@ -91,11 +86,8 @@ export function AuthProvider({ children }) {
   )
 }
 
-// Hook — use this in every component that needs auth state
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used inside <AuthProvider>')
-  }
+  if (!context) throw new Error('useAuth must be used inside <AuthProvider>')
   return context
 }
