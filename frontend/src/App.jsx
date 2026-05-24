@@ -29,9 +29,18 @@ function PageLoader() {
 
 // Smart redirect after login — based on role
 function RoleRedirect() {
-  const { profile, loading } = useAuth()
+  const { profile, loading, profileError } = useAuth()
+
   if (loading) return <PageLoader />
-  if (!profile) return <Navigate to="/" replace />
+
+  // 👇 Show error instead of silent redirect to home
+  if (profileError) return (
+    <div className="min-h-screen flex items-center justify-center text-red-500 text-sm">
+      Failed to load profile. Please refresh or contact support.
+    </div>
+  )
+
+  if (!profile) return <Navigate to="/login" replace />  // 👈 /login not /
   return <Navigate to={profile.role === 'admin' ? '/admin' : '/'} replace />
 }
 
