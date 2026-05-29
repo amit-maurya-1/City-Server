@@ -1,10 +1,9 @@
-// src/pages/RegisterPage.jsx
-
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, MapPin, UserPlus, ShieldCheck, ChevronDown } from 'lucide-react'
+import { Eye, EyeOff, MapPin, UserPlus, ShieldCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { registerCitizen, registerAdmin, fetchCities } from '@/services/authService'
+import CitySearchSelect from '@/components/ui/CitySearchSelect'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -29,14 +28,14 @@ export default function RegisterPage() {
 
   function validate() {
     const e = {}
-    if (!form.full_name.trim())         e.full_name = 'Full name is required.'
-    if (!form.email.trim())             e.email     = 'Email is required.'
-    if (form.password.length < 8)       e.password  = 'Password must be at least 8 characters.'
+    if (!form.full_name.trim())       e.full_name       = 'Full name is required.'
+    if (!form.email.trim())           e.email           = 'Email is required.'
+    if (form.password.length < 8)     e.password        = 'Password must be at least 8 characters.'
     if (form.password !== form.confirm_password)
-                                        e.confirm_password = 'Passwords do not match.'
-    if (!form.city_id)                  e.city_id   = 'Please select your city.'
+                                      e.confirm_password = 'Passwords do not match.'
+    if (!form.city_id)                e.city_id         = 'Please select your city.'
     if (form.is_admin && !form.secret_code.trim())
-                                        e.secret_code = 'Admin secret code is required.'
+                                      e.secret_code     = 'Admin secret code is required.'
     return e
   }
 
@@ -51,20 +50,16 @@ export default function RegisterPage() {
     try {
       if (form.is_admin) {
         await registerAdmin({
-          email: form.email,
-          password: form.password,
-          full_name: form.full_name,
-          city_id: form.city_id,
+          email: form.email, password: form.password,
+          full_name: form.full_name, city_id: form.city_id,
           secret_code: form.secret_code,
         })
         toast.success('Admin account created! Please log in.')
         navigate('/login')
       } else {
         await registerCitizen({
-          email: form.email,
-          password: form.password,
-          full_name: form.full_name,
-          city_id: form.city_id,
+          email: form.email, password: form.password,
+          full_name: form.full_name, city_id: form.city_id,
         })
         toast.success('Account created! Check your email to confirm.')
         navigate('/login')
@@ -128,25 +123,23 @@ export default function RegisterPage() {
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
 
-            {/* City */}
+            {/* City — Searchable dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">City</label>
-              <div className="relative">
-                <select
-                  name="city_id" value={form.city_id} onChange={handleChange}
-                  className={`input appearance-none pr-8 ${errors.city_id ? 'border-red-400' : ''}`}
-                  disabled={loading || loadingCities}
-                >
-                  <option value="">
-                    {loadingCities ? 'Loading cities…' : 'Select your city'}
-                  </option>
-                  {cities.map(city => (
-                    <option key={city.id} value={city.id}>{city.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-              {errors.city_id && <p className="text-red-500 text-xs mt-1">{errors.city_id}</p>}
+              {loadingCities ? (
+                <div className="input text-gray-400 text-sm">Loading cities…</div>
+              ) : (
+                <CitySearchSelect
+                  cities={cities}
+                  value={form.city_id}
+                  onChange={val => {
+                    setForm(prev => ({ ...prev, city_id: val }))
+                    if (errors.city_id) setErrors(prev => ({ ...prev, city_id: null }))
+                  }}
+                  error={errors.city_id}
+                  disabled={loading}
+                />
+              )}
               <p className="text-xs text-gray-400 mt-1">Cannot be changed after registration.</p>
             </div>
 
@@ -195,14 +188,14 @@ export default function RegisterPage() {
                   type="checkbox" name="is_admin" checked={form.is_admin} onChange={handleChange}
                   className="w-4 h-4 accent-emerald-600" disabled={loading}
                 />
-                <span className="text-sm text-gray-700 group-hover:text-gray-900 flex items-center gap-1.5">
+                <span className="text-sm text-gray-700 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-indigo-500" />
                   Register as Admin
                 </span>
               </label>
             </div>
 
-            {/* Admin secret code — only shows when checkbox is ticked */}
+            {/* Admin secret code */}
             {form.is_admin && (
               <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
                 <label className="block text-sm font-medium text-indigo-800 mb-1.5">
@@ -214,9 +207,7 @@ export default function RegisterPage() {
                   placeholder="Enter the admin secret code" disabled={loading}
                 />
                 {errors.secret_code && <p className="text-red-500 text-xs mt-1">{errors.secret_code}</p>}
-                <p className="text-xs text-indigo-600 mt-2">
-                  Contact your city administrator for this code.
-                </p>
+                <p className="text-xs text-indigo-600 mt-2">Contact your city administrator for this code.</p>
               </div>
             )}
 
