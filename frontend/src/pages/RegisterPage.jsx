@@ -1,3 +1,6 @@
+// src/pages/RegisterPage.jsx
+// Updated with searchable city dropdown
+
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, MapPin, UserPlus, ShieldCheck } from 'lucide-react'
