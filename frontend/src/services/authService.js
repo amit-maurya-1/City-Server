@@ -50,8 +50,8 @@ export async function fetchCities() {
   const { data, error } = await supabase
     .from('cities')
     .select('id, name')
-    .order('name', { ascending: true })
-
-  if (error) throw new Error(error.message)
+    .order('name')
+  
+  if (error) throw error
   return data
 }
