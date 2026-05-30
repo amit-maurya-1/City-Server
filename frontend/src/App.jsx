@@ -1,22 +1,19 @@
-// src/App.jsx
-// All routes defined here. Add new routes in one place.
-
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { AuthProvider, useAuth } from '@/contexts/AuthContext'
-import ProtectedRoute from '@/components/layout/ProtectedRoute'
-import Navbar from '@/components/layout/Navbar'
+import { AuthProvider, useAuth } from '@/contexts/AuthContext.jsx'
+import ProtectedRoute from '@/components/layout/ProtectedRoute.jsx'
+import Navbar from '@/components/layout/Navbar.jsx'
 
 // Pages — lazy imports for better initial load time
 import { lazy, Suspense } from 'react'
 
-const MapPage        = lazy(() => import('@/pages/MapPage'))
-const ReportPage     = lazy(() => import('@/pages/ReportPage'))
-const IssueDetailPage= lazy(() => import('@/pages/IssueDetailPage'))
-const AdminPage      = lazy(() => import('@/pages/AdminPage'))
-const LoginPage      = lazy(() => import('@/pages/LoginPage'))
-const RegisterPage   = lazy(() => import('@/pages/RegisterPage'))
-const NotFoundPage   = lazy(() => import('@/pages/NotFoundPage'))
+const MapPage         = lazy(() => import('@/pages/MapPage.jsx'))
+const ReportPage      = lazy(() => import('@/pages/ReportPage.jsx'))
+const IssueDetailPage = lazy(() => import('@/pages/IssueDetailPage.jsx'))
+const AdminPage       = lazy(() => import('@/pages/AdminPage.jsx'))
+const LoginPage       = lazy(() => import('@/pages/LoginPage.jsx'))
+const RegisterPage    = lazy(() => import('@/pages/RegisterPage.jsx'))
+const NotFoundPage    = lazy(() => import('@/pages/NotFoundPage.jsx'))
 
 // Full-screen spinner for lazy page loads
 function PageLoader() {
