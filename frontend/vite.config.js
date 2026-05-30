@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Use @ as shorthand for src/ everywhere
       '@': resolve(__dirname, './src'),
     },
+    extensions: ['.jsx', '.js', '.tsx', '.ts', '.json'], 
   },
   server: {
     port: 3000,
