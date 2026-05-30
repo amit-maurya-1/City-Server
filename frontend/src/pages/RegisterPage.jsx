@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, MapPin, UserPlus, ShieldCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { registerCitizen, registerAdmin, fetchCities } from '@/services/authService'
-import CitySearchSelect from '../components/ui/CitySearchSelect.jsx'
+import CitySearchSelect from '@/components/ui/CitySearchSelect.jsx'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
