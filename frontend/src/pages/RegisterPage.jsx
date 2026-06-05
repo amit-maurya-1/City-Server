@@ -107,7 +107,7 @@ export default function RegisterPage() {
               <input
                 type="text" name="full_name" value={form.full_name} onChange={handleChange}
                 className={`input ${errors.full_name ? 'border-red-400' : ''}`}
-                placeholder="Rahul Sharma" disabled={loading}
+                placeholder="Enter your full name" disabled={loading}
               />
               {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
             </div>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
               <input
                 type="email" name="email" value={form.email} onChange={handleChange}
                 className={`input ${errors.email ? 'border-red-400' : ''}`}
-                placeholder="you@example.com" autoComplete="email" disabled={loading}
+                placeholder="Enter your email" autoComplete="email" disabled={loading}
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
