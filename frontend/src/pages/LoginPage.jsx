@@ -76,7 +76,7 @@ export default function LoginPage() {
               <input
                 type="email" name="email" value={form.email} onChange={handleChange}
                 className={`input ${errors.email ? 'border-red-400 focus:ring-red-400' : ''}`}
-                placeholder="you@example.com" autoComplete="email" disabled={loading}
+                placeholder="Enter your email" autoComplete="email" disabled={loading}
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
